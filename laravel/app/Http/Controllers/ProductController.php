@@ -47,4 +47,37 @@ class ProductController extends Controller
 
         return back()->with(['message' => rtFormat($Product)]);
     }
+
+    public function edit($id)
+    {
+        $product = Product::find($id);
+        if (!$product) {
+            return redirect(route('product.list'))->with(['message' => rtFormat($id, 0, '查無資料')]);
+        }
+
+        return Inertia::render('Backend/Product/EditProduct', ['response' => rtFormat($product)]);
+    }
+
+    public function update(Request $request)
+    {
+        dd($request->all());
+        $request->validate([
+            'formData.name' => 'required|max:255|string',
+            'formData.price' => 'required|min:0|numeric',
+            'formData.public' => 'required',
+            'formData.desc' => 'max:255',
+            'id' => 'required|exists:products,id'
+        ]);
+        $product = Product::find($request->id);
+
+        // 轉物件
+        // $formData = (object) $request->formData;
+        $product->update([
+            'name' => $request->formData['name'],
+            'price' => $request->formData['price'],
+            'public' => $request->formData['public'],
+            'desc' => $request->formData['desc'],
+        ]);
+        return back()->with(['message' => rtFormat($product)]);
+    }
 }

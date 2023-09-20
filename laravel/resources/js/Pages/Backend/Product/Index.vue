@@ -16,7 +16,7 @@ export default {
       if (![1, 2].includes(num)) return '';
       return num;
     },
-    deleteProduct() {
+    deleteProduct(id) {
       Swal.fire({
         title: '確定要刪除？',
         showDenyButton: true,
@@ -24,7 +24,7 @@ export default {
         denyButtonText: '取消',
       }).then((result) => {
         if (result.isConfirmed) {
-          router.visit(route('product.delete'), { method: 'delete', data: { id } });
+          router.visit(route('product.delete'), { method: 'delete', data: { id: id } });
         }
       });
     },
@@ -66,8 +66,10 @@ export default {
             <td>{{ item.desc }}</td>
             <td>
               <div>
-                <button type="button" class="px-3 py-2 border border-black rounded-[5px]">編輯</button>
-                <button type="button" class="px-3 py-2 border border-black bg-[red] rounded-[5px] text-white" @click="deleteProduct()">刪除</button>
+                <Link :href="route('product.edit', { id: item.id })">
+                  <button type="button" class="px-3 py-2 border border-black rounded-[5px]">編輯</button>
+                </Link>
+                <button type="button" class="px-3 py-2 border border-black bg-[red] rounded-[5px] text-white" @click="deleteProduct(item.id)">刪除</button>
               </div>
             </td>
           </tr>

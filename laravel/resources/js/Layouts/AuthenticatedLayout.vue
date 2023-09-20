@@ -54,7 +54,7 @@ export default {
                 <NavLink :href="route('dashboard')" :active="currentUrl('dashboard')">
                   Dashboard
                 </NavLink>
-                <NavLink :href="route('Product.list')" :active="currentUrl('Product.list')">
+                <NavLink :href="route('product.list')" :active="currentUrl('product.list')">
                   Product
                 </NavLink>
               </div>
@@ -141,7 +141,7 @@ export default {
             <ResponsiveNavLink :href="route('dashboard')" :active="currentUrl('dashboard')">
               Dashboard
             </ResponsiveNavLink>
-            <ResponsiveNavLink :href="route('Product.list')" :active="currentUrl('Product.list')">
+            <ResponsiveNavLink :href="route('product.list')" :active="currentUrl('product.list')">
               Product
             </ResponsiveNavLink>
           </div>

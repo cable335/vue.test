@@ -8,35 +8,47 @@ export default {
     AuthenticatedLayout,
     Head,
   },
+  props: {
+    response: Object,
+  },
   data() {
     return {
       formData: {
-        name: '',
-        price: '',
-        public: '',
-        desc: '',
+        name: this.response?.rt_data?.name ?? '',
+        price: this.response?.rt_data?.price ?? '',
+        public: this.response?.rt_data?.public ?? '',
+        desc: this.response?.rt_data?.desc ?? '',
       },
     };
   },
   methods: {
     submitData() {
-      const { formData } = this;
+      const { formData, response: { rt_data: { id } } } = this;
       // 驗證
-      router.visit(route('product.store'), { method: 'post', data: formData,
-        onSuccess: ({ props }) => {
-          if (props.flash.message.rt_code === 1) {
-            Swal.fire({
-              title: '新增成功',
-              showDenyButton: true,
-              confirmButtonText: '回列表',
-              denyButtonText: '取消',
-            }).then((result) => {
-              if (result.isConfirmed) {
-                router.get(route('product.list'));
+      Swal.fire({
+        title: `確認更新商品: ${ name }?`,
+        showDenyButton: true,
+        confirmButtonText: '更新',
+        denyButtonText: '取消',
+      }).then((result) => {
+        if (result.isConfirmed) {
+          router.visit(route('product.update'), { method: 'put', data: { formData, id },
+            onSuccess: ({ props }) => {
+              if (props.flash.message.rt_code === 1) {
+                Swal.fire({
+                  title: '更新成功',
+                  showDenyButton: true,
+                  confirmButtonText: '回列表',
+                  denyButtonText: '取消',
+                }).then((result) => {
+                  if (result.isConfirmed) {
+                    router.get(route('product.list'));
+                  }
+                });
               }
-            });
-          }
-        },
+            },
+          });
+        }
       });
     },
   },
@@ -49,7 +61,7 @@ export default {
     <template #header>
       <div class="flex justify-between items-center">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">Product</h2>
-        <button type="button" class="font-semibold text-xl text-gray-800 leading-tight border border-black p-3 rounded-[6px]">新增商品</button>
+        <button type="button" class="font-semibold text-xl text-gray-800 leading-tight border border-black p-3 rounded-[6px]">編輯商品</button>
       </div>
     </template>
     <section id="product-create" class="px-[15px] py-[10px] bg-white mt-[30px] rounded-[6px]">
@@ -78,8 +90,10 @@ export default {
           <input v-model="formData.desc" type="text" name="desc">
         </label>
         <div class="flex justify-center items-center gap-[45px]">
-          <button type="submit">確認</button>
-          <button type="button">取消</button>
+          <button type="submit">更新</button>
+          <Link :href="route('product.list')">
+            <button type="button">取消</button>
+          </Link>
         </div>
       </form>
     </section>
