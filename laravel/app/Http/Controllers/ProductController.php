@@ -60,13 +60,15 @@ class ProductController extends Controller
 
     public function update(Request $request)
     {
-        dd($request->all());
         $request->validate([
             'formData.name' => 'required|max:255|string',
             'formData.price' => 'required|min:0|numeric',
-            'formData.public' => 'required',
+            'formData.public' => 'required|numeric',
             'formData.desc' => 'max:255',
-            'id' => 'required|exists:products,id'
+            'id' => 'required|exists:products,id',
+        ], [
+            'formData.name.required' => '商品名稱必填',
+            'formData.name.max' => '商品名稱不得多於255個字',
         ]);
         $product = Product::find($request->id);
 

@@ -23,6 +23,7 @@ export default {
   },
   methods: {
     submitData() {
+      // 解譯
       const { formData, response: { rt_data: { id } } } = this;
       // 驗證
       Swal.fire({
@@ -51,6 +52,10 @@ export default {
         }
       });
     },
+    inputClass(item) {
+      if (!item) return '';
+      return 'border-[red] rounded-[5px]';
+    },
   },
 };
 </script>
@@ -58,6 +63,7 @@ export default {
 <template>
   <Head title="product" />
   <AuthenticatedLayout>
+    {{ $page.props.errors['formData.name'] ?? '' }}
     <template #header>
       <div class="flex justify-between items-center">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">Product</h2>
@@ -68,11 +74,13 @@ export default {
       <form @submit.prevent="submitData()">
         <label>
           商品名稱:
-          <input v-model="formData.name" type="text" name="name" required>
+          <input v-model="formData.name" :class="{ 'border-[red]': $page.props.errors['formData.name'] }" type="text" name="name" required>
+          <div class="text-[red]">{{ $page.props?.errors['formData.name'] ?? '' }}</div>
         </label>
         <label>
           商品價格:
-          <input v-model="formData.price" type="text" min="0" name="price" required>
+          <input v-model="formData.price" :class="inputClass($page.props?.errors['formData.price'])" type="text" min="0" name="price" required>
+          <div class="text-[red]">{{ $page.props?.errors['formData.price'] ?? '' }}</div>
         </label>
         公開/非公開:
         <div class="flex items-center gap-[10px]">
@@ -87,13 +95,11 @@ export default {
         </div>
         <label>
           商品描述:
-          <input v-model="formData.desc" type="text" name="desc">
+          <input v-model="formData.desc" type="text" name="desc" :class="inputClass($page.props?.errors['formData.desc'])">
         </label>
         <div class="flex justify-center items-center gap-[45px]">
-          <button type="submit">更新</button>
-          <Link :href="route('product.list')">
-            <button type="button">取消</button>
-          </Link>
+          <button class="btn" type="submit">更新</button>
+          <button class="btn" type="button">取消</button>
         </div>
       </form>
     </section>

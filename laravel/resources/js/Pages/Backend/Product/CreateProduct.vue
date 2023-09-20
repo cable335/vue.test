@@ -12,6 +12,7 @@ export default {
     return {
       formData: {
         name: '',
+        image: '',
         price: '',
         public: '',
         desc: '',
@@ -39,6 +40,18 @@ export default {
         },
       });
     },
+    uploadImage(event) {
+      const { formData } = this;
+      const reader = new FileReader();
+      reader.readAsDataURL(event.target.files[0]);
+      reader.onload = function () {
+        console.log(reader.result);
+        formData.image = reader.result;
+      };
+      reader.onerror = function (error) {
+        console.log('Error: ', error);
+      };
+    },
   },
 };
 </script>
@@ -57,6 +70,15 @@ export default {
         <label>
           商品名稱:
           <input v-model="formData.name" type="text" name="name" required>
+        </label>
+        <label>
+          商品照片:
+          <input v-model="formData.image" type="hidden" min="0" required>
+          <label v-if="!formData.image" for="image" class="border w-[200px] aspect-[4/3] flex justify-center items-center text-[48px] cursor-pointer ">
+            +
+          </label>
+          <input class="hidden" type="file" min="0" name="image" required @change="(event) => uploadImage(event)">
+          <img v-if="formData.image" :src="formData.image" class="w-[200px] aspect-[4/3] object-cover" alt="上傳的照片">
         </label>
         <label>
           商品價格:

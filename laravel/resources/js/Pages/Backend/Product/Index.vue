@@ -61,7 +61,8 @@ export default {
             <td>{{ index + 1 }}</td>
             <td>{{ item.name }}</td>
             <td>${{ item.price }}</td>
-            <td>{{ item.public }}</td>
+            <td v-if="item.public === 1">公開</td>
+            <td v-else>非公開</td>
             <td>{{ item.timeFormat }}</td>
             <td>{{ item.desc }}</td>
             <td>
