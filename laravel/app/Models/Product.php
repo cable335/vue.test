@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Model;
 
 /**
  * Class Product
- * 
+ *
  * @property int $id
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
@@ -34,8 +34,17 @@ class Product extends Model
 
     protected $fillable = [
         'name',
+        'img_path',
         'price',
         'public',
         'desc'
     ];
+
+    public function cart(){
+        return $this->hasMany(Cart::class, 'id', 'product_id');
+    }
+
+    public function productImg(){
+        return $this->hasMany(ProductImg::class,'id', 'product_id');
+    }
 }

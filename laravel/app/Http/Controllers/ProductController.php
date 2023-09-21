@@ -3,11 +3,16 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
+use App\Models\ProductImg;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use App\Services\FileService;
 
 class ProductController extends Controller
 {
+    public function __construct(protected FileService $fileService)
+    {
+    }
     public function index(){
         $product = Product::orderBy('id','desc')->get()->map(function($item) {
             $item->timeFormat = $item->created_at->format('Y/m/d');
@@ -22,17 +27,26 @@ class ProductController extends Controller
     {
         $request->validate([
             'name' => 'required|max:255',
+            'image' => 'required|string',
             'price' => 'required|min:0|numeric',
             'public' => 'required|numeric',
             'desc' => 'max:255',
         ]);
-
         $Product = Product::create([
             'name' => $request->name,
             'price' => $request->price,
             'public' => $request->public,
             'desc' => $request->desc,
+            'img_path' => $this->fileService->base64Upload($request->image, 'product'),
         ]);
+
+        foreach ($request->otherImage ?? [] as $key => $value) {
+            ProductImg::create([
+                'product_id' => $Product->id,
+                'img_path' => $this->fileService->base64Upload($value['img_path'], 'otherproduct'),
+                'sort' => 1,
+            ]);
+        }
 
         return back()->with(['message' => rtFormat($Product)]);
     }
@@ -43,7 +57,10 @@ class ProductController extends Controller
             'id' => 'required|exists:products,id',
         ]);
 
-        $Product = Product::find($request->id)->delete();
+        $Product = Product::find($request->id);
+
+        $this->fileService->deleteUpload($Product->img_path);
+        $Product->delete();
 
         return back()->with(['message' => rtFormat($Product)]);
     }

@@ -48,6 +48,7 @@ export default {
         <thead>
           <tr>
             <th>#</th>
+            <th>商品圖片</th>
             <th>商品名稱</th>
             <th>商品價格</th>
             <th>公開/非公開</th>
@@ -59,6 +60,9 @@ export default {
         <tbody>
           <tr v-for="(item, index) in response.rt_data" :key="item.id">
             <td>{{ index + 1 }}</td>
+            <td class="text-center flex justify-center">
+              <img class="border w-[200px] aspect-[4/3] flex justify-center items-center text-[48px]" :src="item.img_path" alt="">
+            </td>
             <td>{{ item.name }}</td>
             <td>${{ item.price }}</td>
             <td v-if="item.public === 1">公開</td>

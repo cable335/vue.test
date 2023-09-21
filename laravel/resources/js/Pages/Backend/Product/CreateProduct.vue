@@ -13,15 +13,19 @@ export default {
       formData: {
         name: '',
         image: '',
+        otherImage: [
+        ],
         price: '',
         public: '',
         desc: '',
       },
+      imageSize: 0,
     };
   },
   methods: {
     submitData() {
       const { formData } = this;
+      if (this.imageSize > 3145728) return Swal.fire('圖片檔案過大');
       // 驗證
       router.visit(route('product.store'), { method: 'post', data: formData,
         onSuccess: ({ props }) => {
@@ -41,16 +45,32 @@ export default {
       });
     },
     uploadImage(event) {
-      const { formData } = this;
       const reader = new FileReader();
       reader.readAsDataURL(event.target.files[0]);
-      reader.onload = function () {
+      reader.onload = () => {
         console.log(reader.result);
-        formData.image = reader.result;
+        this.formData.image = reader.result;
+        this.imageSize += event.target.files[0].size;
       };
-      reader.onerror = function (error) {
+      reader.onerror = (error) => {
         console.log('Error: ', error);
       };
+    },
+    uploadOtherImage(event) {
+      const reader = new FileReader();
+      reader.readAsDataURL(event.target.files[0]);
+      reader.onload = () => {
+        this.formData.otherImage.push({
+          id: Math.max(0, ...this.formData.otherImage.map(item => item.id)) + 1,
+          img_path: reader.result,
+          size: event.target.files[0].size,
+        });
+        this.imageSize += event.target.files[0].size;
+      };
+    },
+    removeImage(id) {
+      this.imageSize -= this.formData.otherImage.find((item) => item.id === id).size;
+      this.formData.otherImage = this.formData.otherImage.filter((item) => item.id !== id);
     },
   },
 };
@@ -73,13 +93,25 @@ export default {
         </label>
         <label>
           商品照片:
-          <input v-model="formData.image" type="hidden" min="0" required>
-          <label v-if="!formData.image" for="image" class="border w-[200px] aspect-[4/3] flex justify-center items-center text-[48px] cursor-pointer ">
-            +
-          </label>
-          <input class="hidden" type="file" min="0" name="image" required @change="(event) => uploadImage(event)">
-          <img v-if="formData.image" :src="formData.image" class="w-[200px] aspect-[4/3] object-cover" alt="上傳的照片">
+          <div class="relative w-[200px]">
+            <div v-if="!formData.image" class="border w-[200px] aspect-[4/3] flex justify-center items-center text-[48px] cursor-pointer ">
+              +
+            </div>
+            <input class="absolute top-1/2 left-1/2 translate-y-[10px] w-[1px] h-[1px] opacity-0" type="file" min="0" name="image" required @change="(event) => uploadImage(event)">
+            <img v-if="formData.image" :src="formData.image" class="w-[200px] aspect-[4/3] object-cover" alt="上傳的照片">
+          </div>
         </label>
+        其他照片:
+        <div class="flex flex-wrap gap-[30px]">
+          <div v-for="item in formData.otherImage" :key="item.id" class="relative">
+            <img :src="item.img_path" class="border w-[200px] aspect-[4/3] flex justify-center items-center text-[48px] cursor-pointer " alt="">
+            <button type="button" class="rounded-full w-[20px] h-[20px] flex justify-center items-center bg-[red] text-white absolute top-0 right-0 translate-x-1/2 -translate-y-1/2" @click="removeImage(item.id)"></button>
+          </div>
+          <label class="border w-[200px] aspect-[4/3] flex justify-center items-center text-[48px] cursor-pointer ">
+            +
+            <input type="file" class="hidden" @change="(event) => uploadOtherImage(event)">
+          </label>
+        </div>
         <label>
           商品價格:
           <input v-model="formData.price" type="text" min="0" name="price" required>
@@ -101,7 +133,9 @@ export default {
         </label>
         <div class="flex justify-center items-center gap-[45px]">
           <button type="submit">確認</button>
-          <button type="button">取消</button>
+          <Link :href="route('product.list')">
+            <button type="button">取消</button>
+          </Link>
         </div>
       </form>
     </section>
